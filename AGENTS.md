@@ -50,10 +50,11 @@ Layers: `raw` -> `core` (star schema) -> `reporting`.
 
 ## Git
 - Branch per task: `feat/raw-load`, `feat/core-model`, ...
-- Small commits, message format: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`
+- Small commits, message format: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `chore: ...`
 - Show `git diff --stat` before committing. Do not push to `main` directly.
 
 ## Definition of done for any task
 - SQL/script runs cleanly from scratch via `python run_pipeline.py`
 - `python scripts/run_tests.py` passes (once core exists)
 - Short note added to `docs/design_decisions.md` explaining the "why"
+
