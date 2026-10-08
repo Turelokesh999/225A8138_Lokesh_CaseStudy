@@ -17,18 +17,19 @@ The verifier counts CSV records with Python's csv.reader because review comments
 
 The verifier found all 99,441 customer zip prefixes have length 5. The core model should preserve them as-is and only apply lpad to a prefix if its length is actually below 5.
 ## 02_core_model
-The core layer uses dimensions for customer, product, seller and calendar context,
-with one order fact per order and one item fact per order line. I keep the source
-customer key on orders and retain the stable customer_unique_id in the customer
-dimension, so order joins stay valid while repeat-customer analysis can group
-people across orders. Payments are summed and reviews are reduced to the latest
-row at order grain before either is joined to orders; this avoids multiplying
-orders or item revenue. Geolocation is averaged per postal prefix before lookup
-for the same reason. Postal prefixes remain text, and lpad is conditional because
-the raw customer prefixes were all five characters in the verifier run. Delivery
-duration and lateness are populated only for delivered orders with the required
-timestamps; missing translations fall back to the source category, then
-`unknown`.
+Draft for review and rewriting in my own words: the core model separates customer,
+product, seller, and date attributes from order and order-item facts. Payments are
+summed to one row per order before joining so split payments cannot multiply an
+order row or its item revenue. Reviews use `ROW_NUMBER()` ordered by the latest
+answer timestamp to keep one review per order. Delivery days use the difference
+between purchase and customer-delivery calendar dates; lateness compares the
+delivery and estimated-delivery timestamps. Both are only set for delivered
+orders with a customer-delivery timestamp. A complete date calendar is generated
+between the first and last purchase date. Zip prefixes stay text; the model checks
+customer and seller zips together and applies five-character padding consistently
+only if a source prefix is not already five characters. No geolocation join is
+performed in this phase. Orders without items are preserved in the order fact;
+some non-fulfillment statuses have no item rows in the source.
 
 ## 03_reporting_views
 ## 04_optimization
