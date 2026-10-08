@@ -6,7 +6,8 @@
 |---|---|
 | Setup | DONE |
 | Raw load | DONE |
-| Core model | IN PROGRESS |
+| Core model | DONE |
+| Extra checks (Phase 3) | IN PROGRESS |
 | Reporting | TODO |
 | Benchmarks | TODO |
 | Analysis | TODO |
