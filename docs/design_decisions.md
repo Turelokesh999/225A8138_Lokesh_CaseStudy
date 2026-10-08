@@ -32,6 +32,18 @@ performed in this phase. Orders without items are preserved in the order fact;
 some non-fulfillment statuses have no item rows in the source.
 
 ## 03_reporting_views
+Draft for review and rewriting in my own words: reporting views aggregate from
+the core star schema. Sales, seller, and regional revenue use item price and
+aggregate at item or order grain before joining to dimensions, so order or
+payment multiplicity cannot repeat revenue. Monthly growth is shown only inside
+the complete-month window; January 2017 has no growth value because its previous
+month is outside that window. Customer analysis groups by `customer_unique_id`;
+recency is measured from the latest purchase date in the warehouse, while
+frequency and monetary scores rank order count and item spend. Delivery measures
+include delivered orders only, and late percentage uses orders with a known
+estimated-delivery timestamp. Revenue is price only in sales and product reports;
+freight is shown separately in monthly sales.
+
 ## 04_optimization
 ## Spark/Hadoop vs DuckDB mapping
 
