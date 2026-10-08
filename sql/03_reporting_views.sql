@@ -116,7 +116,10 @@ WITH spend_by_order AS (
 ), rfm_scores AS (
   SELECT *,
          ntile(5) OVER (ORDER BY recency_days DESC, customer_unique_id) AS recency_score,
-         ntile(5) OVER (ORDER BY orders, customer_unique_id) AS frequency_score,
+         CASE WHEN orders = 1 THEN 1
+              WHEN orders = 2 THEN 3
+              WHEN orders >= 3 THEN 5
+         END AS frequency_score,
          ntile(5) OVER (ORDER BY total_spend, customer_unique_id) AS monetary_score
   FROM rfm_base
 )

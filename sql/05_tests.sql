@@ -104,3 +104,11 @@ WHERE is_complete_month IS DISTINCT FROM
         (month BETWEEN DATE '2017-01-01' AND DATE '2018-08-01')
    OR (revenue_growth_pct IS NOT NULL AND
        (NOT is_complete_month OR month = DATE '2017-01-01'));
+
+-- test: equal customer order counts always have the same frequency score
+SELECT count(*) FROM (
+  SELECT orders
+  FROM reporting.rpt_customer_analysis
+  GROUP BY orders
+  HAVING count(DISTINCT frequency_score) > 1
+) inconsistent_frequency_scores;
