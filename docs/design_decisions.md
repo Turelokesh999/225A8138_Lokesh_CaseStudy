@@ -47,3 +47,6 @@ freight is shown separately in monthly sales.
 ## 04_optimization
 ## Spark/Hadoop vs DuckDB mapping
 
+
+## 05_scale_up
+The scale-up dataset repeats real core order-item rows to make controlled performance tests large enough to measure. Price jitter and dates are generated from a fixed seed, so reruns are reproducible while year/month partitions contain useful spread. These rows are synthetic and must not be presented as actual Olist sales or business findings.
