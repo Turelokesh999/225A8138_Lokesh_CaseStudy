@@ -48,3 +48,59 @@ SELECT CASE WHEN abs(
   (SELECT sum(price + freight_value) FROM core.fact_order_items) -
   (SELECT sum(price + freight_value) FROM raw.order_items)
 ) < 0.01 THEN 0 ELSE 1 END;
+
+-- test: reporting sales revenue reconciles for complete months
+SELECT CASE WHEN abs(
+  (SELECT sum(revenue) FROM reporting.rpt_sales_summary
+   WHERE month >= DATE '2017-01-01' AND month < DATE '2018-09-01') -
+  (SELECT sum(i.price) FROM core.fact_order_items i
+   JOIN core.fact_orders o USING (order_id)
+   WHERE o.purchase_ts >= TIMESTAMP '2017-01-01'
+     AND o.purchase_ts < TIMESTAMP '2018-09-01')
+) < 0.01 THEN 0 ELSE 1 END;
+
+-- test: product performance revenue reconciles to core item price
+SELECT CASE WHEN abs(
+  (SELECT sum(revenue) FROM reporting.rpt_product_performance) -
+  (SELECT sum(price) FROM core.fact_order_items)
+) < 0.01 THEN 0 ELSE 1 END;
+
+-- test: customer analysis has one row per customer_unique_id
+SELECT count(*) - count(DISTINCT customer_unique_id)
+FROM reporting.rpt_customer_analysis;
+
+-- test: delivery report covers every delivered order exactly once
+SELECT abs(
+  (SELECT sum(delivered_orders) FROM reporting.rpt_delivery_performance) -
+  (SELECT count(*) FROM core.fact_orders WHERE order_status = 'delivered')
+);
+
+-- test: seller scorecard revenue reconciles to core item price
+SELECT CASE WHEN abs(
+  (SELECT sum(revenue) FROM reporting.rpt_seller_scorecard) -
+  (SELECT sum(price) FROM core.fact_order_items)
+) < 0.01 THEN 0 ELSE 1 END;
+
+-- test: regional sales revenue reconciles to core item price
+SELECT CASE WHEN abs(
+  (SELECT sum(revenue) FROM reporting.rpt_regional_sales) -
+  (SELECT sum(price) FROM core.fact_order_items)
+) < 0.01 THEN 0 ELSE 1 END;
+
+-- test: customer RFM scores are all from 1 through 5
+SELECT count(*) FROM reporting.rpt_customer_analysis
+WHERE recency_score NOT BETWEEN 1 AND 5
+   OR frequency_score NOT BETWEEN 1 AND 5
+   OR monetary_score NOT BETWEEN 1 AND 5;
+
+-- test: product revenue shares total 100 percent
+SELECT CASE WHEN abs(sum(revenue_share_pct) - 100.0) < 0.01
+            THEN 0 ELSE 1 END
+FROM reporting.rpt_product_performance;
+
+-- test: sales growth is restricted to complete months with a complete prior month
+SELECT count(*) FROM reporting.rpt_sales_summary
+WHERE is_complete_month IS DISTINCT FROM
+        (month BETWEEN DATE '2017-01-01' AND DATE '2018-08-01')
+   OR (revenue_growth_pct IS NOT NULL AND
+       (NOT is_complete_month OR month = DATE '2017-01-01'));
