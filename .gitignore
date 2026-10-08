@@ -1,0 +1,25 @@
+# Data and generated artifacts (rebuildable, never commit)
+data/raw/*
+!data/raw/.gitkeep
+*.duckdb
+*.duckdb.wal
+*.parquet
+tmp/
+results/logs/*
+!results/logs/.gitkeep
+
+# Secrets
+.env
+kaggle.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,5 @@
+-- 01_raw_load.sql: load Olist CSVs into schema raw with EXPLICIT types.
+-- TODO (Codex task 1): 9 tables, e.g.
+-- CREATE OR REPLACE TABLE raw.orders AS
+--   SELECT * FROM read_csv('data/raw/olist_orders_dataset.csv', header=true, types={...});
+-- Zip prefixes must be VARCHAR. Print row counts at the end.
